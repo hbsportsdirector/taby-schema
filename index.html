@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Täby HBK · Partille World Cup 2026 — Live-schema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4EFE6; --paper-2:#FBF8F2; --ink:#17130E; --ink-soft:#54493B;
+    --line:#E4DBCB; --line-2:#D3C7B2;
+    --red:#C81E2C; --red-deep:#A0121E; --navy:#103B5A; --green:#0F8A56; --amber:#C2741A;
+    --shadow:0 1px 0 rgba(23,19,14,.04), 0 8px 24px -18px rgba(23,19,14,.5);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(120% 60% at 100% -10%, rgba(16,59,90,.07), transparent 60%), var(--paper);
+    color:var(--ink); font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.45; padding-bottom:40px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+
+  header.top{position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg, rgba(244,239,230,.97), rgba(244,239,230,.88));
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top-inner{max-width:760px;margin:0 auto;padding:14px 16px 12px;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .crest{display:flex;align-items:center;gap:11px}
+  .mark{width:38px;height:38px;border-radius:9px;background:var(--red);
+    display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+  .mark span{font-family:"Barlow Condensed",sans-serif;font-weight:800;color:#fff;font-size:20px;letter-spacing:.5px;line-height:1}
+  .titles h1{margin:0;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:21px;letter-spacing:.3px;text-transform:uppercase;line-height:1.02}
+  .titles p{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft);font-weight:500}
+  .sync{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;
+    padding:6px 10px;border-radius:999px;border:1px solid var(--line-2);background:var(--paper-2);
+    color:var(--ink-soft);white-space:nowrap;cursor:pointer;user-select:none}
+  .sync .dot{width:8px;height:8px;border-radius:50%;background:var(--ink-soft);flex:none}
+  .sync.live{color:#0c6b43;border-color:rgba(15,138,86,.4);background:rgba(15,138,86,.08)}
+  .sync.live .dot{background:var(--green);animation:pulse 1.8s infinite}
+  .sync.cached{color:#8a5712;border-color:rgba(194,116,26,.4);background:rgba(194,116,26,.08)}
+  .sync.cached .dot{background:var(--amber)}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(15,138,86,.45)}70%{box-shadow:0 0 0 7px rgba(15,138,86,0)}100%{box-shadow:0 0 0 0 rgba(15,138,86,0)}}
+
+  .controls{padding:14px 0 2px}
+  .ctrl-label{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-soft);margin:0 2px 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:14px;letter-spacing:.4px;
+    padding:5px 12px;border-radius:999px;border:1.5px solid var(--line-2);background:var(--paper-2);
+    color:var(--ink-soft);cursor:pointer;text-transform:uppercase;transition:transform .05s}
+  .chip:active{transform:scale(.95)}
+  .chip.ctl{font-size:12px;border-style:dashed}
+  .bottom-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;user-select:none}
+  .toggle input{appearance:none;width:34px;height:19px;border-radius:999px;background:var(--line-2);position:relative;cursor:pointer;transition:.18s;flex:none}
+  .toggle input:checked{background:var(--green)}
+  .toggle input::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.18s}
+  .toggle input:checked::after{transform:translateX(15px)}
+  .followcount{font-size:12px;color:var(--ink-soft)}
+
+  .day{margin-top:22px}
+  .day-head{display:flex;align-items:baseline;gap:10px;margin:0 2px 9px}
+  .day-head .d-name{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1.2px}
+  .day-head .d-rule{flex:1;height:1px;background:var(--line-2)}
+  .day-head .d-count{font-size:11.5px;color:var(--ink-soft);font-weight:600}
+
+  .match{display:grid;grid-template-columns:54px 1fr auto;gap:12px;align-items:center;
+    background:var(--paper-2);border:1px solid var(--line);border-left:4px solid var(--line-2);
+    border-radius:13px;padding:11px 13px;margin-bottom:9px;box-shadow:var(--shadow)}
+  .time{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:21px;letter-spacing:.5px;line-height:1;text-align:center}
+  .time small{display:block;font-size:10px;font-weight:600;color:var(--ink-soft);letter-spacing:.3px;margin-top:3px;font-family:"Inter",sans-serif}
+  .mid{min-width:0}
+  .teams{font-size:15px;font-weight:500;line-height:1.3}
+  .teams .vs{color:var(--ink-soft);font-size:13px;padding:0 5px}
+  .teams .me{font-weight:700;color:var(--red-deep)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:5px}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--paper);border:1px solid var(--line);color:var(--ink-soft)}
+  .tag.cls{color:#fff;border:none}
+  .tag.moved{background:rgba(194,116,26,.12);border-color:rgba(194,116,26,.45);color:#8a5712}
+  .tag.new{background:rgba(16,59,90,.1);border-color:rgba(16,59,90,.35);color:#103B5A}
+  .loc{font-size:12px;color:var(--ink-soft);display:inline-flex;align-items:center;gap:4px}
+  .right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+  .score{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:22px;letter-spacing:1px;line-height:1}
+  .score .w{color:var(--green)} .score .l{color:var(--ink-soft)}
+  .status{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-soft)}
+  .status.live{color:var(--green);display:inline-flex;align-items:center;gap:5px}
+  .status.live .lv{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+  .status.fin{color:var(--navy)}
+
+  .empty{text-align:center;color:var(--ink-soft);padding:40px 16px;font-size:14px}
+  .note{margin-top:26px;padding:14px 15px;border:1px dashed var(--line-2);border-radius:12px;background:var(--paper-2);font-size:12.5px;color:var(--ink-soft);line-height:1.6}
+  .note a{color:var(--red-deep);font-weight:600;text-decoration:none}
+  .note a:hover{text-decoration:underline}
+  .note b{color:var(--ink)}
+
+  @media (max-width:460px){
+    .titles h1{font-size:18px}
+    .match{grid-template-columns:46px 1fr auto;gap:10px;padding:10px 11px}
+    .time{font-size:19px}.teams{font-size:14px}.score{font-size:20px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="crest">
+      <div class="mark"><span>T</span></div>
+      <div class="titles">
+        <h1>Täby HBK · Partille 2026</h1>
+        <p>Alla lag — välj vilka du följer</p>
+      </div>
+    </div>
+    <button class="sync" id="sync" title="Uppdatera nu">
+      <span class="dot"></span><span id="syncText">Ansluter…</span>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <p class="ctrl-label">Följ lag (tryck för att välja)</p>
+    <div class="chips" id="chips"></div>
+    <div class="bottom-row">
+      <label class="toggle"><input type="checkbox" id="upcoming"> Endast kommande</label>
+      <span class="followcount" id="followcount"></span>
+    </div>
+  </div>
+
+  <div id="board"></div>
+
+  <div class="note">
+    <b>Så funkar det.</b> Schemat hämtas live från samma öppna data som Partille World Cups
+    egen resultatsida (cupmanager) och uppdaterar sig var 60:e sekund så länge sidan är öppen.
+    Flyttas en match visas en <b>Flyttad</b>-markering med ny tid eller plan; tillkommande
+    slutspelsmatcher märks <b>Ny</b>. Tiderna är lokala (svensk) speltider.
+    Sidan minns vilka lag du följer på den här enheten.<br>
+    Når sidan inte Partille visas senast sparade schema. Officiell källa &amp; livestream:
+    <a href="https://results.partillecup.com/2026" target="_blank" rel="noopener">results.partillecup.com</a>.
+    För notiser även när du inte tittar – favoritmarkera lagen i <b>Partille World Cup-appen</b>.
+  </div>
+</div>
+
+<script>
+const CFG = {
+  endpoint: "https://results.cupmanager.net/rest/tournamentapp_graphql",
+  cupId: 1078445,
+  tournamentId: "74172233",
+  // Alla 13 Täby HBK-lag (klass → lag-id)
+  teamIds: [79683306,79692364,79683114,79682945,79682309,79682562,79682318,79683347,79683573,79682476,79683101,79683437,79683583],
+  refreshMs: 60000
+};
+
+const ALL_CLASSES = ["B13","B14","B15","B16","B18","B21","G14","G16","G18"];
+const CLASS_COLOR = {B13:"#B5631C",B14:"#1C86A6",B15:"#1E6FB0",B16:"#0F8A56",B18:"#7A3FB0",B21:"#C81E2C",G14:"#C2186F",G16:"#7A7A14",G18:"#0E6E7A"};
+const STORAGE_KEY = "tabyFollow.v1";
+
+// Sparat schema (reserv om API:et inte går att nå). [klass, grupp, hemma, borta, startTime(ms), plan]
+const SNAPSHOT = [["B18","Grp 3","Täby HBK","BK Heid",1782806400000,"1 Fristad Arena (Heden)"],["B14","Grp 15","Elverum Håndball 2","Täby HBK 2",1782806400000,"Heden 20 - Toyota"],["B13","Grp 4","HK Ankaret 1","Täby HBK 2",1782808500000,"Heden 26"],["G16","Grp 15","Kärra HF 1","Täby HBK 2",1782808500000,"Kviberg 17"],["G18","Grp 7","Strandby-Elling IF","Täby HBK",1782810600000,"Kviberg 20"],["B15","Grp 7","Herning FH","Täby HBK 1",1782810600000,"Heden 23"],["B13","Grp 7","Lugi HF 1","Täby HBK 1",1782812700000,"Härlanda Park 4"],["B16","Grp 8","SK Trygg Lade","Täby HBK 1",1782812700000,"Härlanda Park 8"],["B14","Grp 15","Täby HBK 2","HK Aranäs",1782812700000,"Heden 7 - Cilia"],["B18","Grp 3","Täby HBK","Levanger HK",1782814800000,"Heden 9"],["B13","Grp 4","Täby HBK 2","HEI Håndbold",1782814800000,"Heden 25"],["G16","Grp 15","Ski IL","Täby HBK 2",1782814800000,"Kviberg 20"],["G18","Grp 7","Fjellhammer IL Grønn","Täby HBK",1782816900000,"Kviberg 16"],["B15","Grp 7","Täby HBK 1","Önnereds HK",1782816900000,"Heden 26"],["B13","Grp 7","Täby HBK 1","Rödovre HK 2",1782819000000,"Härlanda Park 2"],["B16","Grp 8","Täby HBK 1","HSG Nordwest 2",1782819000000,"Härlanda Park 10"],["B14","Grp 1","Kragerö IF","Täby HBK 1",1782821100000,"Heden 18 - Toyota "],["G14","Grp 9","Täby HBK","JSG Vordertaunus",1782825300000,"Heden 20 - Toyota"],["G16","Grp 1","Täby HBK 1","Önnereds HK 1",1782827400000,"2 Fristad Arena (Heden)"],["B16","Grp 15","Strindheim IL 2","Täby HBK 2",1782829500000,"4 Fristad Arena (Heden)"],["B21","Grp 1","Täby HBK","IK Sävehof",1782831600000,"Kviberg 10"],["G16","Grp 1","Täby HBK 1","Nordstrand IF 1",1782833700000,"4 Fristad Arena (Heden)"],["B16","Grp 15","Täby HBK 2","Maltepe Fide Okulları SK",1782835800000,"Heden 6 - Cilia"],["B21","Grp 1","Leipzig, SC DHfK","Täby HBK",1782837900000,"Kviberg 10"],["G16","Grp 1","Täby HBK 1","Fjellhammer IL 1",1782894900000,"3 Fristad Arena (Heden)"],["B14","Grp 1","Täby HBK 1","BFH/Assefe",1782899100000,"Heden 8 - Cilia"],["G16","Grp 1","Skanderborg HB 1","Täby HBK 1",1782901200000,"3 Fristad Arena (Heden)"],["B14","Grp 1","Hörning Håndbold","Täby HBK 1",1782905400000,"Heden 13"],["B13","Grp 4","H 71 2","Täby HBK 2",1782909600000,"2 Fristad Arena (Heden)"],["B18","Grp 3","Täby HBK","HSG Nordwest 2",1782913800000,"Kviberg 27"],["B15","Grp 7","MTV Dänischenhagen","Täby HBK 1",1782913800000,"Heden 11"],["B14","Grp 15","H 71","Täby HBK 2",1782913800000,"Heden 20 - Toyota"],["G16","Grp 15","Täby HBK 2","IL Rival",1782913800000,"Härlanda Park 5"],["G14","Grp 9","Täby HBK","Elverum Håndball 2",1782915900000,"Heden 27"],["B16","Grp 8","Søndermarkens IK","Täby HBK 1",1782915900000,"Kviberg 25"],["G18","Grp 7","Täby HBK","Torslanda HK 2",1782918000000,"Kviberg 26"],["B18","Grp 3","Strandby-Elling IF","Täby HBK",1782920100000,"Kviberg 13"],["B15","Grp 7","Täby HBK 1","Lugi HF 2",1782920100000,"Heden 12"],["B14","Grp 15","Täby HBK 2","Lugi HF 1",1782920100000,"Heden 23"],["G16","Grp 15","HF Flensburg-Munkbrarup","Täby HBK 2",1782920100000,"Härlanda Park 11"],["G14","Grp 9","HEI Håndbold 1","Täby HBK",1782922200000,"Heden 19 - Toyota"],["B16","Grp 8","Hörning Håndbold 1","Täby HBK 1",1782922200000,"Kviberg 22"],["B21","Grp 1","Levanger HK","Täby HBK",1782924300000,"Heden 12"],["G18","Grp 7","HSG SZOWW","Täby HBK",1782924300000,"Kviberg 25"],["B13","Grp 7","Dunkerque HB Grand Littoral","Täby HBK 1",1782926400000,"Kviberg 13"],["B16","Grp 15","IF Stjernen 1","Täby HBK 2",1782928500000,"Heden 17 - Hummel"],["B21","Grp 1","Täby HBK","HK Ankaret",1782930600000,"Heden 15 - Hummel"],["B13","Grp 7","BRH","Täby HBK 1",1782932700000,"Kviberg 17"],["B16","Grp 15","Fram","Täby HBK 2",1782934800000,"Heden 7 - Cilia"],["G16","Grp 1","IK Sävehof 1","Täby HBK 1",1782979200000,"3 Fristad Arena (Heden)"],["B14","Grp 1","Fylkir 1","Täby HBK 1",1782981300000,"Kviberg 10"],["B13","Grp 4","HUBO Handbal","Täby HBK 2",1782981300000,"Kviberg 20"],["B14","Grp 1","Täby HBK 1","Önnereds HK 2",1782987600000,"Kviberg 14"],["B13","Grp 4","Täby HBK 2","IK Sävehof 3",1782987600000,"Kviberg 12"],["G16","Grp 1","Lugi HF 1","Täby HBK 1",1782991800000,"3 Fristad Arena (Heden)"],["B14","Grp 15","Täby HBK 2","St Gregory's High School",1782991800000,"Kviberg 15"],["B13","Grp 7","Täby HBK 1","Mölndals HF Röd",1782993900000,"Heden 25"],["B16","Grp 8","Täby HBK 1","HK Ankaret 2",1782993900000,"Heden 21"],["B16","Grp 15","Täby HBK 2","IK Sund",1782993900000,"Kviberg 24"],["G16","Grp 15","Täby HBK 2","Roskilde Håndbold",1782993900000,"Heden 10"],["G14","Grp 9","Täby HBK","Herning FH",1782996000000,"Härlanda Park 2"],["B15","Grp 7","Täby HBK 1","Lilleström HK 2",1782998100000,"Härlanda Park 4"],["B18","Grp 3","MT Ost","Täby HBK",1783000200000,"Härlanda Park 6"],["G18","Grp 7","Täby HBK","HK Brukspöjkera",1783000200000,"Heden 6 - Cilia"],["B21","Grp 1","Täby HBK","Backa HK",1783002300000,"Härlanda Park 5"],["G14","Grp 9","IK Sävehof 1","Täby HBK",1783002300000,"Härlanda Park 3"],["B21","Grp 1","Kungälvs HK","Täby HBK",1783008600000,"Härlanda Park 9"],["B18","Grp 3","IFK Hammarö","Täby HBK",1783012800000,"Härlanda Park 9"]];
+
+function snapKey(cat,h,a){return cat+"|"+h+"|"+a;}
+const snapMap = new Map();
+const snapData = SNAPSHOT.map(r=>{
+  snapMap.set(snapKey(r[0],r[2],r[3]),{t:r[4],loc:r[5]});
+  return {cat:r[0],grp:r[1],home:r[2],away:r[3],t:r[4],loc:r[5],hs:0,as:0,live:false,fin:false,wo:false,moved:null,isNew:false};
+});
+
+// Partille kodar starttid som lokal Göteborgstid förklädd till UTC → formatera matchtid/dag i UTC.
+const MTZ = "UTC";
+const fmtTime = new Intl.DateTimeFormat("sv-SE",{hour:"2-digit",minute:"2-digit",timeZone:MTZ});
+const fmtDay  = new Intl.DateTimeFormat("sv-SE",{weekday:"long",day:"numeric",month:"long",timeZone:MTZ});
+const fmtDayKey = new Intl.DateTimeFormat("sv-SE",{year:"numeric",month:"2-digit",day:"2-digit",timeZone:MTZ});
+// Riktig klocka (Sverige) för "Live"-etiketten (äkta tidsstämpel, inte matchdata).
+const fmtClock = new Intl.DateTimeFormat("sv-SE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Stockholm"});
+function stockholmOffset(){const d=new Date();return new Date(d.toLocaleString("en-US",{timeZone:"Europe/Stockholm"}))-new Date(d.toLocaleString("en-US",{timeZone:"UTC"}));}
+
+function loadFollow(){
+  try{ const s=localStorage.getItem(STORAGE_KEY); if(s){const a=JSON.parse(s); if(Array.isArray(a)) return new Set(a.filter(c=>ALL_CLASSES.includes(c)));} }catch(e){}
+  return new Set(ALL_CLASSES);
+}
+function saveFollow(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify([...state.follow])); }catch(e){} }
+
+let state = {data:snapData, live:false, syncedAt:null, follow:loadFollow(), upcoming:false};
+
+function buildUrl(){
+  const q = `query m($cupId: Int!, $tournamentId: String!, $teamIds: [Int]) { teamsMatches(cupId: $cupId, tournamentId: $tournamentId, teamIds: $teamIds) { id categoryShortName divisionName homeTeamName awayTeamName homeScore awayScore startTime locationName isLive isFinished isWalkover } }`;
+  const vars = {cupId:CFG.cupId, tournamentId:CFG.tournamentId, teamIds:CFG.teamIds};
+  return CFG.endpoint + "?query=" + encodeURIComponent(q) + "&operationName=m&variables=" + encodeURIComponent(JSON.stringify(vars));
+}
+
+async function fetchLive(){
+  const ctrl = new AbortController();
+  const to = setTimeout(()=>ctrl.abort(), 12000);
+  try{
+    const r = await fetch(buildUrl(), {signal:ctrl.signal});
+    clearTimeout(to);
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j = await r.json();
+    if(!j.data || !j.data.teamsMatches) throw new Error("no data");
+    state.data = j.data.teamsMatches.map(x=>{
+      const snap = snapMap.get(snapKey(x.categoryShortName,x.homeTeamName,x.awayTeamName));
+      let moved=null, isNew=false;
+      if(snap){
+        if(snap.t!==x.startTime) moved = {old:snap.t};
+        if(snap.loc!==x.locationName) moved = Object.assign(moved||{}, {oldLoc:snap.loc});
+      }else{ isNew=true; }
+      return {cat:x.categoryShortName, grp:(x.divisionName||"").replace("Group","Grp"),
+        home:x.homeTeamName, away:x.awayTeamName, hs:x.homeScore, as:x.awayScore,
+        t:x.startTime, loc:x.locationName, live:x.isLive, fin:x.isFinished, wo:x.isWalkover, moved, isNew};
+    });
+    state.live = true; state.syncedAt = Date.now();
+  }catch(e){
+    state.live = false;
+    if(!state.syncedAt) state.data = snapData;
+  }finally{ render(); }
+}
+
+function isMe(name){return /Täby/.test(name);}
+function colorOf(cat){return CLASS_COLOR[cat]||"#7d7468";}
+
+function renderChips(){
+  const wrap = document.getElementById("chips");
+  let h = `<button class="chip ctl" data-act="all">Alla</button><button class="chip ctl" data-act="none">Inga</button>`;
+  for(const c of ALL_CLASSES){
+    const on = state.follow.has(c), col = colorOf(c);
+    h += `<button class="chip" data-cls="${c}" aria-pressed="${on}" style="${on?`background:${col};border-color:transparent;color:#fff`:``}">${c}</button>`;
+  }
+  wrap.innerHTML = h;
+  document.getElementById("followcount").textContent =
+    state.follow.size===ALL_CLASSES.length ? "Följer alla lag" :
+    state.follow.size===0 ? "Inga lag valda" :
+    "Följer " + state.follow.size + " av " + ALL_CLASSES.length + " klasser";
+}
+
+function setSync(){
+  const el = document.getElementById("sync"), txt = document.getElementById("syncText");
+  el.classList.remove("live","cached");
+  if(state.live){ el.classList.add("live"); txt.textContent = "Live · " + fmtClock.format(state.syncedAt); }
+  else{ el.classList.add("cached"); txt.textContent = state.syncedAt ? ("Senast " + fmtClock.format(state.syncedAt)) : "Sparat schema"; }
+}
+
+function render(){
+  setSync();
+  const board = document.getElementById("board");
+  const now = Date.now() + stockholmOffset();
+  let rows = state.data.filter(m=>state.follow.has(m.cat));
+  if(state.upcoming) rows = rows.filter(m=> m.live || (!m.fin && m.t + 110*60000 > now));
+  rows = rows.slice().sort((a,b)=>a.t-b.t);
+
+  if(!state.follow.size){ board.innerHTML = '<div class="empty">Välj minst ett lag ovan för att se matcher.</div>'; return; }
+  if(!rows.length){ board.innerHTML = '<div class="empty">Inga matcher matchar filtret.</div>'; return; }
+
+  const groups = []; const idx = new Map();
+  for(const m of rows){
+    const key = fmtDayKey.format(new Date(m.t));
+    if(!idx.has(key)){ idx.set(key, groups.length); groups.push({day:fmtDay.format(new Date(m.t)), items:[]}); }
+    groups[idx.get(key)].items.push(m);
+  }
+
+  let html = "";
+  for(const g of groups){
+    const dname = g.day.charAt(0).toUpperCase()+g.day.slice(1);
+    html += `<section class="day"><div class="day-head"><span class="d-name">${dname}</span><span class="d-rule"></span><span class="d-count">${g.items.length} ${g.items.length===1?"match":"matcher"}</span></div>`;
+    for(const m of g.items){
+      const homeMe = isMe(m.home), awayMe = isMe(m.away), col = colorOf(m.cat);
+      const teams = `<span class="${homeMe?'me':''}">${esc(m.home)}</span><span class="vs">–</span><span class="${awayMe?'me':''}">${esc(m.away)}</span>`;
+      let right = "";
+      if(m.live){
+        right = `<div class="score"><span class="${m.hs>=m.as?'w':'l'}">${m.hs}</span>–<span class="${m.as>=m.hs?'w':'l'}">${m.as}</span></div><div class="status live"><span class="lv"></span>Live</div>`;
+      }else if(m.fin){
+        const meWin=(homeMe&&m.hs>m.as)||(awayMe&&m.as>m.hs), meLose=(homeMe&&m.hs<m.as)||(awayMe&&m.as<m.hs);
+        right = `<div class="score"><span class="${m.hs>=m.as?'w':'l'}">${m.hs}</span>–<span class="${m.as>=m.hs?'w':'l'}">${m.as}</span></div><div class="status fin">${m.wo?'WO':(meWin?'Vinst':meLose?'Förlust':'Slut')}</div>`;
+      }else{ right = `<div class="status">Kommande</div>`; }
+
+      let tags = `<span class="tag cls" style="background:${col}">${m.cat}</span>`;
+      if(m.grp) tags += `<span class="tag">${esc(m.grp)}</span>`;
+      tags += `<span class="loc">▸ ${esc(m.loc||"—")}</span>`;
+      if(m.moved){
+        if(m.moved.old!==undefined) tags += `<span class="tag moved">Flyttad · var ${fmtTime.format(new Date(m.moved.old))}</span>`;
+        if(m.moved.oldLoc!==undefined) tags += `<span class="tag moved">Ny plan</span>`;
+      }
+      if(m.isNew) tags += `<span class="tag new">Ny</span>`;
+
+      html += `<div class="match" style="border-left-color:${col}">
+        <div class="time">${fmtTime.format(new Date(m.t))}<small>${m.cat}</small></div>
+        <div class="mid"><div class="teams">${teams}</div><div class="meta">${tags}</div></div>
+        <div class="right">${right}</div></div>`;
+    }
+    html += `</section>`;
+  }
+  board.innerHTML = html;
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
+
+document.getElementById("chips").addEventListener("click",e=>{
+  const b = e.target.closest(".chip"); if(!b) return;
+  if(b.dataset.act==="all") state.follow = new Set(ALL_CLASSES);
+  else if(b.dataset.act==="none") state.follow = new Set();
+  else { const c=b.dataset.cls; state.follow.has(c) ? state.follow.delete(c) : state.follow.add(c); }
+  saveFollow(); renderChips(); render();
+});
+document.getElementById("upcoming").addEventListener("change",e=>{state.upcoming=e.target.checked;render();});
+document.getElementById("sync").addEventListener("click",()=>fetchLive());
+
+renderChips();
+render();
+fetchLive();
+setInterval(fetchLive, CFG.refreshMs);
+</script>
+</body>
+</html>
