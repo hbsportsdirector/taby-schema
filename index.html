@@ -52,13 +52,27 @@
     color:var(--ink-soft);cursor:pointer;text-transform:uppercase;transition:transform .05s}
   .chip:active{transform:scale(.95)}
   .chip.ctl{font-size:12px;border-style:dashed}
-  .bottom-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .bottom-row{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
   .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;user-select:none}
   .toggle input{appearance:none;width:34px;height:19px;border-radius:999px;background:var(--line-2);position:relative;cursor:pointer;transition:.18s;flex:none}
   .toggle input:checked{background:var(--green)}
   .toggle input::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.18s}
   .toggle input:checked::after{transform:translateX(15px)}
   .followcount{font-size:12px;color:var(--ink-soft)}
+
+  .editbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
+    padding:10px 12px;border-radius:11px;background:var(--paper-2);border:1px solid var(--line)}
+  .editbar .estatus{font-size:12.5px;font-weight:600;color:var(--ink-soft);display:inline-flex;align-items:center;gap:6px}
+  .lockbtn{font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:9px;border:1.5px solid var(--line-2);
+    background:var(--paper);color:var(--ink);cursor:pointer}
+  .lockbtn.on{background:var(--green);border-color:transparent;color:#fff}
+  .unlockrow{display:none;align-items:center;gap:8px;flex-wrap:wrap;width:100%}
+  .unlockrow.show{display:flex}
+  .unlockrow input{font:inherit;font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--paper);color:var(--ink);min-width:150px}
+  .unlockrow input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(16,59,90,.12)}
+  .unlockrow .go{font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:8px;border:none;background:var(--navy);color:#fff;cursor:pointer}
+  .unlockmsg{font-size:12px;font-weight:600}
+  .unlockmsg.err{color:var(--red-deep)} .unlockmsg.ok{color:#0c6b43}
 
   .clash-summary{margin:14px 0 0;padding:11px 13px;border-radius:11px;background:rgba(200,30,44,.08);
     border:1px solid rgba(200,30,44,.35);color:#8e1620;font-size:13px;font-weight:600;display:none}
@@ -103,6 +117,7 @@
   .coach:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(16,59,90,.12)}
   .coach.has{border-color:var(--navy);font-weight:600}
   .coach.bad{border-color:var(--red);background:rgba(200,30,44,.05)}
+  .coach.locked{background:transparent;border-style:dashed;cursor:default}
 
   .empty{text-align:center;color:var(--ink-soft);padding:40px 16px;font-size:14px}
   .note{margin-top:26px;padding:14px 15px;border:1px dashed var(--line-2);border-radius:12px;background:var(--paper-2);font-size:12.5px;color:var(--ink-soft);line-height:1.6}
@@ -143,6 +158,16 @@
       <label class="toggle"><input type="checkbox" id="upcoming"> Endast kommande</label>
       <span class="followcount" id="followcount"></span>
     </div>
+
+    <div class="editbar">
+      <span class="estatus" id="estatus">🔒 Skrivskyddat</span>
+      <button class="lockbtn" id="lockBtn">Lås upp redigering</button>
+      <div class="unlockrow" id="unlockRow">
+        <input id="codeInput" type="password" placeholder="Redigeringskod" autocomplete="off">
+        <button class="go" id="unlockGo">Lås upp</button>
+        <span class="unlockmsg" id="unlockMsg"></span>
+      </div>
+    </div>
   </div>
 
   <div class="clash-summary" id="clashSummary"></div>
@@ -152,14 +177,14 @@
   <div class="note">
     <b>Schema.</b> Hämtas live från samma öppna data som Partille World Cups resultatsida
     och uppdateras var 60:e sekund. Flyttade matcher märks <b>Flyttad</b>, nya slutspelsmatcher <b>Ny</b>.
-    Tiderna är lokala speltider. Dina val (följda lag + tränare) sparas på den här enheten.<br>
-    <b>Tränare &amp; krockvarning.</b> Skriv in vem som tar varje match i fältet
-    <i>Tränare</i>. Är samma person bokad på två matcher där hen inte hinner emellan –
-    antingen för att tiderna överlappar eller för att restiden mellan arenorna inte räcker –
-    markeras båda matcherna rött med en <b>⚠</b>-varning. Det räknar med ca
-    <b>50 min</b> per match och ungefärlig restid mellan områdena (Heden, Härlanda Park, Kviberg).
-    Säg till om du vill justera de antagandena.<br>
-    Officiell källa: <a href="https://results.partillecup.com/2026" target="_blank" rel="noopener">results.partillecup.com</a>.
+    Tiderna är lokala speltider.<br>
+    <b>Tränare (delat).</b> Tränarpassen är gemensamma – alla som öppnar sidan ser samma.
+    För att <b>ändra</b> krävs en redigeringskod (tryck <i>Lås upp redigering</i>). Är samma
+    person bokad på två matcher där hen inte hinner emellan – pga överlappande tider eller
+    för kort restid mellan arenorna – markeras båda rött med <b>⚠</b>. Räknar med ca
+    <b>50 min</b> per match och ungefärlig restid mellan områdena (Heden, Härlanda Park, Kviberg).<br>
+    Vilka lag du följer sparas lokalt på din enhet. Officiell källa:
+    <a href="https://results.partillecup.com/2026" target="_blank" rel="noopener">results.partillecup.com</a>.
   </div>
 </div>
 
@@ -172,22 +197,22 @@ const CFG = {
   refreshMs: 60000
 };
 
-// Antaganden för krockvarningen (minuter). Lätt att justera.
+// Supabase (delad tränarlista). Publika klientvärden – avsedda för webbläsare.
+const SUPA_URL = "https://cifalabilwsqafgympkg.supabase.co";
+const SUPA_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZmFsYWJpbHdzcWFmZ3ltcGtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyMDMyMjQsImV4cCI6MjA2Mzc3OTIyNH0.JTFVfNg4viHbXkxjOOSrMnV8ZeOg2YdOh_sO5VtR7Lk";
+const supaHeaders = {"apikey":SUPA_ANON,"authorization":"Bearer "+SUPA_ANON,"content-type":"application/json"};
+
 const SCHED = {
-  matchMinutes: 50,        // hur länge en match upptar en tränare
-  travel: {                // ungefärlig restid mellan områden
-    "Heden|Härlanda Park":20, "Heden|Kviberg":25, "Härlanda Park|Kviberg":20
-  },
-  sameAreaMin: 5,          // gångtid mellan hallar inom samma område
-  defaultTravelMin: 25     // om ett områdespar saknas ovan
+  matchMinutes: 50,
+  travel: {"Heden|Härlanda Park":20,"Heden|Kviberg":25,"Härlanda Park|Kviberg":20},
+  sameAreaMin: 5, defaultTravelMin: 25
 };
 
 const ALL_CLASSES = ["B13","B14","B15","B16","B18","B21","G14","G16","G18"];
 const CLASS_COLOR = {B13:"#B5631C",B14:"#1C86A6",B15:"#1E6FB0",B16:"#0F8A56",B18:"#7A3FB0",B21:"#C81E2C",G14:"#C2186F",G16:"#7A7A14",G18:"#0E6E7A"};
 const FOLLOW_KEY = "tabyFollow.v1";
-const COACH_KEY = "tabyCoaches.v1";
+const EDITCODE_KEY = "tabyEditCode.v1";
 
-// Sparat schema (reserv om API:et inte går att nå). [klass, grupp, hemma, borta, startTime(ms), plan]
 const SNAPSHOT = [["B18","Grp 3","Täby HBK","BK Heid",1782806400000,"1 Fristad Arena (Heden)"],["B14","Grp 15","Elverum Håndball 2","Täby HBK 2",1782806400000,"Heden 20 - Toyota"],["B13","Grp 4","HK Ankaret 1","Täby HBK 2",1782808500000,"Heden 26"],["G16","Grp 15","Kärra HF 1","Täby HBK 2",1782808500000,"Kviberg 17"],["G18","Grp 7","Strandby-Elling IF","Täby HBK",1782810600000,"Kviberg 20"],["B15","Grp 7","Herning FH","Täby HBK 1",1782810600000,"Heden 23"],["B13","Grp 7","Lugi HF 1","Täby HBK 1",1782812700000,"Härlanda Park 4"],["B16","Grp 8","SK Trygg Lade","Täby HBK 1",1782812700000,"Härlanda Park 8"],["B14","Grp 15","Täby HBK 2","HK Aranäs",1782812700000,"Heden 7 - Cilia"],["B18","Grp 3","Täby HBK","Levanger HK",1782814800000,"Heden 9"],["B13","Grp 4","Täby HBK 2","HEI Håndbold",1782814800000,"Heden 25"],["G16","Grp 15","Ski IL","Täby HBK 2",1782814800000,"Kviberg 20"],["G18","Grp 7","Fjellhammer IL Grønn","Täby HBK",1782816900000,"Kviberg 16"],["B15","Grp 7","Täby HBK 1","Önnereds HK",1782816900000,"Heden 26"],["B13","Grp 7","Täby HBK 1","Rödovre HK 2",1782819000000,"Härlanda Park 2"],["B16","Grp 8","Täby HBK 1","HSG Nordwest 2",1782819000000,"Härlanda Park 10"],["B14","Grp 1","Kragerö IF","Täby HBK 1",1782821100000,"Heden 18 - Toyota "],["G14","Grp 9","Täby HBK","JSG Vordertaunus",1782825300000,"Heden 20 - Toyota"],["G16","Grp 1","Täby HBK 1","Önnereds HK 1",1782827400000,"2 Fristad Arena (Heden)"],["B16","Grp 15","Strindheim IL 2","Täby HBK 2",1782829500000,"4 Fristad Arena (Heden)"],["B21","Grp 1","Täby HBK","IK Sävehof",1782831600000,"Kviberg 10"],["G16","Grp 1","Täby HBK 1","Nordstrand IF 1",1782833700000,"4 Fristad Arena (Heden)"],["B16","Grp 15","Täby HBK 2","Maltepe Fide Okulları SK",1782835800000,"Heden 6 - Cilia"],["B21","Grp 1","Leipzig, SC DHfK","Täby HBK",1782837900000,"Kviberg 10"],["G16","Grp 1","Täby HBK 1","Fjellhammer IL 1",1782894900000,"3 Fristad Arena (Heden)"],["B14","Grp 1","Täby HBK 1","BFH/Assefe",1782899100000,"Heden 8 - Cilia"],["G16","Grp 1","Skanderborg HB 1","Täby HBK 1",1782901200000,"3 Fristad Arena (Heden)"],["B14","Grp 1","Hörning Håndbold","Täby HBK 1",1782905400000,"Heden 13"],["B13","Grp 4","H 71 2","Täby HBK 2",1782909600000,"2 Fristad Arena (Heden)"],["B18","Grp 3","Täby HBK","HSG Nordwest 2",1782913800000,"Kviberg 27"],["B15","Grp 7","MTV Dänischenhagen","Täby HBK 1",1782913800000,"Heden 11"],["B14","Grp 15","H 71","Täby HBK 2",1782913800000,"Heden 20 - Toyota"],["G16","Grp 15","Täby HBK 2","IL Rival",1782913800000,"Härlanda Park 5"],["G14","Grp 9","Täby HBK","Elverum Håndball 2",1782915900000,"Heden 27"],["B16","Grp 8","Søndermarkens IK","Täby HBK 1",1782915900000,"Kviberg 25"],["G18","Grp 7","Täby HBK","Torslanda HK 2",1782918000000,"Kviberg 26"],["B18","Grp 3","Strandby-Elling IF","Täby HBK",1782920100000,"Kviberg 13"],["B15","Grp 7","Täby HBK 1","Lugi HF 2",1782920100000,"Heden 12"],["B14","Grp 15","Täby HBK 2","Lugi HF 1",1782920100000,"Heden 23"],["G16","Grp 15","HF Flensburg-Munkbrarup","Täby HBK 2",1782920100000,"Härlanda Park 11"],["G14","Grp 9","HEI Håndbold 1","Täby HBK",1782922200000,"Heden 19 - Toyota"],["B16","Grp 8","Hörning Håndbold 1","Täby HBK 1",1782922200000,"Kviberg 22"],["B21","Grp 1","Levanger HK","Täby HBK",1782924300000,"Heden 12"],["G18","Grp 7","HSG SZOWW","Täby HBK",1782924300000,"Kviberg 25"],["B13","Grp 7","Dunkerque HB Grand Littoral","Täby HBK 1",1782926400000,"Kviberg 13"],["B16","Grp 15","IF Stjernen 1","Täby HBK 2",1782928500000,"Heden 17 - Hummel"],["B21","Grp 1","Täby HBK","HK Ankaret",1782930600000,"Heden 15 - Hummel"],["B13","Grp 7","BRH","Täby HBK 1",1782932700000,"Kviberg 17"],["B16","Grp 15","Fram","Täby HBK 2",1782934800000,"Heden 7 - Cilia"],["G16","Grp 1","IK Sävehof 1","Täby HBK 1",1782979200000,"3 Fristad Arena (Heden)"],["B14","Grp 1","Fylkir 1","Täby HBK 1",1782981300000,"Kviberg 10"],["B13","Grp 4","HUBO Handbal","Täby HBK 2",1782981300000,"Kviberg 20"],["B14","Grp 1","Täby HBK 1","Önnereds HK 2",1782987600000,"Kviberg 14"],["B13","Grp 4","Täby HBK 2","IK Sävehof 3",1782987600000,"Kviberg 12"],["G16","Grp 1","Lugi HF 1","Täby HBK 1",1782991800000,"3 Fristad Arena (Heden)"],["B14","Grp 15","Täby HBK 2","St Gregory's High School",1782991800000,"Kviberg 15"],["B13","Grp 7","Täby HBK 1","Mölndals HF Röd",1782993900000,"Heden 25"],["B16","Grp 8","Täby HBK 1","HK Ankaret 2",1782993900000,"Heden 21"],["B16","Grp 15","Täby HBK 2","IK Sund",1782993900000,"Kviberg 24"],["G16","Grp 15","Täby HBK 2","Roskilde Håndbold",1782993900000,"Heden 10"],["G14","Grp 9","Täby HBK","Herning FH",1782996000000,"Härlanda Park 2"],["B15","Grp 7","Täby HBK 1","Lilleström HK 2",1782998100000,"Härlanda Park 4"],["B18","Grp 3","MT Ost","Täby HBK",1783000200000,"Härlanda Park 6"],["G18","Grp 7","Täby HBK","HK Brukspöjkera",1783000200000,"Heden 6 - Cilia"],["B21","Grp 1","Täby HBK","Backa HK",1783002300000,"Härlanda Park 5"],["G14","Grp 9","IK Sävehof 1","Täby HBK",1783002300000,"Härlanda Park 3"],["B21","Grp 1","Kungälvs HK","Täby HBK",1783008600000,"Härlanda Park 9"],["B18","Grp 3","IFK Hammarö","Täby HBK",1783012800000,"Härlanda Park 9"]];
 
 function keyOf(m){return m.cat+"|"+m.home+"|"+m.away;}
@@ -206,16 +231,38 @@ function stockholmOffset(){const d=new Date();return new Date(d.toLocaleString("
 
 function loadFollow(){try{const s=localStorage.getItem(FOLLOW_KEY);if(s){const a=JSON.parse(s);if(Array.isArray(a))return new Set(a.filter(c=>ALL_CLASSES.includes(c)));}}catch(e){}return new Set(ALL_CLASSES);}
 function saveFollow(){try{localStorage.setItem(FOLLOW_KEY,JSON.stringify([...state.follow]));}catch(e){}}
-function loadCoaches(){try{return JSON.parse(localStorage.getItem(COACH_KEY))||{};}catch(e){return {};}}
-function saveCoaches(){try{localStorage.setItem(COACH_KEY,JSON.stringify(state.coaches));}catch(e){}}
 
-let state = {data:snapData, live:false, syncedAt:null, follow:loadFollow(), coaches:loadCoaches(), upcoming:false};
+let state = {data:snapData, live:false, syncedAt:null, follow:loadFollow(),
+             coaches:{}, coachesLoaded:false, editCode:"", canEdit:false};
 
+/* ---------- Supabase delad tränarlista ---------- */
+async function loadCoachesRemote(){
+  try{
+    const r = await fetch(SUPA_URL+"/rest/v1/coach_assignments?select=match_key,coach_name", {headers:supaHeaders});
+    if(!r.ok) throw 0;
+    const rows = await r.json();
+    const m={}; for(const row of rows) m[row.match_key]=row.coach_name;
+    if(!isTypingCoach()){ state.coaches = m; }
+    state.coachesLoaded = true;
+  }catch(e){ /* behåll det vi har */ }
+}
+async function rpc(fn, body){
+  return fetch(SUPA_URL+"/rest/v1/rpc/"+fn, {method:"POST", headers:supaHeaders, body:JSON.stringify(body)});
+}
+async function verifyCode(code){
+  try{ const r=await rpc("verify_edit_code",{p_code:code}); if(!r.ok) return false; return (await r.json())===true; }catch(e){ return false; }
+}
+async function saveCoachRemote(key,name){
+  const r = await rpc("set_coach",{p_key:key, p_name:name, p_code:state.editCode});
+  if(!r.ok){ const t=await r.text(); throw new Error(t.indexOf("WRONG_CODE")>=0?"WRONG_CODE":"FAIL"); }
+  return true;
+}
+
+/* ---------- live-resultat ---------- */
 function buildUrl(){
   const q = `query m($cupId: Int!, $tournamentId: String!, $teamIds: [Int]) { teamsMatches(cupId: $cupId, tournamentId: $tournamentId, teamIds: $teamIds) { id categoryShortName divisionName homeTeamName awayTeamName homeScore awayScore startTime locationName isLive isFinished isWalkover } }`;
   return CFG.endpoint + "?query=" + encodeURIComponent(q) + "&operationName=m&variables=" + encodeURIComponent(JSON.stringify({cupId:CFG.cupId, tournamentId:CFG.tournamentId, teamIds:CFG.teamIds}));
 }
-
 async function fetchLive(){
   const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), 12000);
   try{
@@ -239,6 +286,7 @@ async function fetchLive(){
 
 function isMe(name){return /Täby/.test(name);}
 function colorOf(cat){return CLASS_COLOR[cat]||"#7d7468";}
+function isTypingCoach(){const ae=document.activeElement;return ae&&ae.classList&&ae.classList.contains("coach");}
 
 function areaOf(loc){
   if(!loc) return "?";
@@ -250,8 +298,6 @@ function travelMin(a,b){
   if(a===b) return SCHED.sameAreaMin;
   return SCHED.travel[a+"|"+b] ?? SCHED.travel[b+"|"+a] ?? SCHED.defaultTravelMin;
 }
-
-// Returnerar { matchKey: [meddelande, ...] } för krockar.
 function computeClashes(){
   const byCoach = {};
   for(const m of state.data){
@@ -271,9 +317,7 @@ function computeClashes(){
         const name = (state.coaches[keyOf(a)]||"").trim();
         const short = Math.max(1, Math.round((needT - b.t)/60000));
         const overlap = b.t < a.t + SCHED.matchMinutes*60000;
-        const msg = overlap
-          ? `${name}: krock i tid (~${short} min)`
-          : `${name}: ${ar}→${br}, ~${short} min för kort`;
+        const msg = overlap ? `${name}: krock i tid (~${short} min)` : `${name}: ${ar}→${br}, ~${short} min för kort`;
         (clash[keyOf(a)] = clash[keyOf(a)] || []).push(msg);
         (clash[keyOf(b)] = clash[keyOf(b)] || []).push(msg);
       }
@@ -281,7 +325,6 @@ function computeClashes(){
   }
   return {clash, pairs};
 }
-
 function coachNames(){
   const s = new Set();
   for(const k in state.coaches){ const v=(state.coaches[k]||"").trim(); if(v) s.add(v); }
@@ -301,6 +344,11 @@ function renderChips(){
     state.follow.size===0 ? "Inga lag valda" :
     "Följer " + state.follow.size + " av " + ALL_CLASSES.length + " klasser";
 }
+function renderEditbar(){
+  const st = document.getElementById("estatus"), btn = document.getElementById("lockBtn");
+  if(state.canEdit){ st.textContent = "🔓 Redigeringsläge på"; st.style.color="#0c6b43"; btn.textContent="Lås"; btn.classList.add("on"); }
+  else { st.textContent = "🔒 Skrivskyddat"; st.style.color=""; btn.textContent="Lås upp redigering"; btn.classList.remove("on"); }
+}
 
 function setSync(){
   const el = document.getElementById("sync"), txt = document.getElementById("syncText");
@@ -310,18 +358,13 @@ function setSync(){
 }
 
 function render(){
-  setSync();
-  // Skriv inte över medan användaren skriver i ett tränarfält (t.ex. vid bakgrundsuppdatering).
-  const ae = document.activeElement;
-  if(ae && ae.classList && ae.classList.contains("coach")) { state._pending = true; return; }
-  state._pending = false;
+  setSync(); renderEditbar();
+  if(isTypingCoach()){ return; } // skriv inte över medan man fyller i
 
   const {clash, pairs} = computeClashes();
   const sumEl = document.getElementById("clashSummary");
-  if(pairs>0){ sumEl.classList.add("show"); sumEl.textContent = `⚠ ${pairs} krock${pairs>1?'ar':''}: en tränare hinner inte mellan två matcher. Justera tränare nedan.`; }
+  if(pairs>0){ sumEl.classList.add("show"); sumEl.textContent = `⚠ ${pairs} krock${pairs>1?'ar':''}: en tränare hinner inte mellan två matcher.`; }
   else { sumEl.classList.remove("show"); }
-
-  // uppdatera autocomplete-listan
   document.getElementById("coachlist").innerHTML = coachNames().map(n=>`<option value="${esc(n)}">`).join("");
 
   const board = document.getElementById("board");
@@ -368,8 +411,10 @@ function render(){
       if(cl){ for(const msg of [...new Set(cl)]) tags += `<span class="tag clash">⚠ ${esc(msg)}</span>`; }
 
       const coachVal = state.coaches[key] || "";
-      const coachCls = "coach" + (coachVal?" has":"") + (cl?" bad":"");
-      const coachInput = `<div class="coach-row"><span class="clabel">👤</span><input class="${coachCls}" type="text" list="coachlist" data-key="${esc(key)}" value="${esc(coachVal)}" placeholder="Tränare för denna match…"></div>`;
+      const ro = state.canEdit ? "" : "readonly";
+      const ph = state.canEdit ? "Tränare för denna match…" : (coachVal ? "" : "🔒 lås upp för att fylla i");
+      const coachCls = "coach" + (coachVal?" has":"") + (cl?" bad":"") + (state.canEdit?"":" locked");
+      const coachInput = `<div class="coach-row"><span class="clabel">👤</span><input class="${coachCls}" type="text" list="coachlist" data-key="${esc(key)}" value="${esc(coachVal)}" placeholder="${ph}" ${ro}></div>`;
 
       html += `<div class="match ${cl?'clash':''}" style="border-left-color:${cl?'var(--red)':col}">
         <div class="time">${fmtTime.format(new Date(m.t))}<small>${m.cat}</small></div>
@@ -385,6 +430,7 @@ function render(){
 
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
 
+/* ---------- interaktion ---------- */
 document.getElementById("chips").addEventListener("click",e=>{
   const b = e.target.closest(".chip"); if(!b) return;
   if(b.dataset.act==="all") state.follow = new Set(ALL_CLASSES);
@@ -393,20 +439,67 @@ document.getElementById("chips").addEventListener("click",e=>{
   saveFollow(); renderChips(); render();
 });
 document.getElementById("upcoming").addEventListener("change",e=>{state.upcoming=e.target.checked;render();});
-document.getElementById("sync").addEventListener("click",()=>fetchLive());
+document.getElementById("sync").addEventListener("click",()=>{ fetchLive(); loadCoachesRemote().then(render); });
 
-// Tränarfält: spara + räkna om krockar när man lämnar fältet.
-document.getElementById("board").addEventListener("change",e=>{
+// Lås upp / lås redigering
+document.getElementById("lockBtn").addEventListener("click",()=>{
+  const row = document.getElementById("unlockRow");
+  if(state.canEdit){
+    state.canEdit = false; state.editCode = ""; try{localStorage.removeItem(EDITCODE_KEY);}catch(e){}
+    row.classList.remove("show"); render();
+  } else {
+    row.classList.toggle("show");
+    if(row.classList.contains("show")) document.getElementById("codeInput").focus();
+  }
+});
+async function tryUnlock(){
+  const inp = document.getElementById("codeInput"), msg = document.getElementById("unlockMsg");
+  const code = inp.value.trim(); if(!code) return;
+  msg.className="unlockmsg"; msg.textContent="Kontrollerar…";
+  const ok = await verifyCode(code);
+  if(ok){
+    state.editCode = code; state.canEdit = true;
+    try{localStorage.setItem(EDITCODE_KEY, code);}catch(e){}
+    msg.className="unlockmsg ok"; msg.textContent="Upplåst";
+    document.getElementById("unlockRow").classList.remove("show");
+    inp.value=""; render();
+  } else {
+    msg.className="unlockmsg err"; msg.textContent="Fel kod";
+  }
+}
+document.getElementById("unlockGo").addEventListener("click",tryUnlock);
+document.getElementById("codeInput").addEventListener("keydown",e=>{ if(e.key==="Enter") tryUnlock(); });
+
+// Spara tränare (delat) när man lämnar fältet
+document.getElementById("board").addEventListener("change", async e=>{
   const inp = e.target.closest(".coach"); if(!inp) return;
+  if(!state.canEdit){ render(); return; }
   const key = inp.dataset.key, val = inp.value.trim();
-  if(val) state.coaches[key] = val; else delete state.coaches[key];
-  saveCoaches(); render();
+  inp.disabled = true;
+  try{
+    await saveCoachRemote(key, val);
+    if(val) state.coaches[key] = val; else delete state.coaches[key];
+    render();
+  }catch(err){
+    if(err.message==="WRONG_CODE"){
+      state.canEdit=false; state.editCode=""; try{localStorage.removeItem(EDITCODE_KEY);}catch(e){}
+      alert("Redigeringskoden gäller inte längre. Redigering låstes.");
+    } else {
+      alert("Kunde inte spara tränaren – kontrollera nätet och försök igen.");
+    }
+    inp.disabled = false; render();
+  }
 });
 
-renderChips();
-render();
+/* ---------- init ---------- */
+renderChips(); render();
+loadCoachesRemote().then(render);
+(async()=>{
+  let saved=""; try{ saved=localStorage.getItem(EDITCODE_KEY)||""; }catch(e){}
+  if(saved && await verifyCode(saved)){ state.editCode=saved; state.canEdit=true; render(); }
+})();
 fetchLive();
-setInterval(fetchLive, CFG.refreshMs);
+setInterval(()=>{ fetchLive(); loadCoachesRemote().then(render); }, CFG.refreshMs);
 </script>
 </body>
 </html>
